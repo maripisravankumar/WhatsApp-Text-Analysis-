@@ -1,0 +1,37 @@
+**This snippet of code presented a few issues, predominantly due to the fact that I am running on Mac OS. On Windows & Linux the code provided in the rwhatsapp package appears to work perfectly. 
+The code below made use of additional libraries to obtain emoji data, although the accuracy of the emojis used is questionable. The amount of emojis used appears to be accurate.
+
+library("ggimage")
+emoji_data <- rwhatsapp::emojis %>% # data built into package
+  mutate(hex_runes1 = gsub("\\s[[:alnum:]]+", "", hex_runes)) %>% # ignore combined emojis
+  mutate(emoji_url = paste0("https://abs.twimg.com/emoji/v2/72x72/", 
+                            tolower(hex_runes1), ".png"))
+
+chat_clean <- chat %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+chat_clean <- chat_clean %>%
+  na.omit(chat_clean)
+
+chat_clean <- chat_clean %>%
+  filter(!word %in% to_remove)
+
+chat_clean%>%
+  unnest(emoji) %>%
+  count(author, emoji, sort = TRUE) %>%
+  group_by(author) %>%
+  top_n(n = 3, n) %>%
+  left_join(emoji_data, by = "emoji") %>% 
+  ggplot(aes(x = reorder(emoji, n), y = n, fill = author)) +
+  geom_col(show.legend = FALSE) +
+  ylab("") +
+  xlab("") +
+  coord_flip() +
+  geom_image(aes(y = n + 20, image = emoji_url)) +
+  facet_wrap(~author, ncol = 2, scales = "free_y") +
+  ggtitle("Most often used emojis") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+#_________________________________

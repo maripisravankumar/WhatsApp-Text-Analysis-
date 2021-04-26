@@ -1,0 +1,11 @@
+Retrieving chat logs from the Android or iOS app is very straightforward: Simply choose More in the menu of a chat, then Export chat and export the history to a txt file.
+Once you’ve obtained the txt file, it is necessary to load the file into the rwhatsapp package. The package can handle txt and zip files directly, so simply provide the file pathname.
+The package is extremely versatile and allows you to obtain a host of information about your message
+
+chat %>%
+  mutate(day = date(time)) %>%
+  count(day) %>%
+  ggplot(aes(x = day, y = n)) +
+  geom_bar(stat = "identity", fill = "#52854C") +
+  ylab("") + xlab("") +
+  ggtitle("Messages per day")

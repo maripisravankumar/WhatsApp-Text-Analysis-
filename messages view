@@ -1,0 +1,12 @@
+**This shows who sent the most messages on the chat throughout the year. Some people clearly contributed more than others.
+
+chat_clean %>%
+  mutate(day = date(time)) %>%
+  count(author) %>%
+  ggplot(aes(x = reorder(author, n), y = n)) +
+  geom_bar(stat = "identity", fill = "#52854C") +
+  ylab("") + xlab("") +
+  coord_flip() +
+  ggtitle("Number of messages")
+  
+  

@@ -1,0 +1,31 @@
+Next, we look at the sentiment of each author over the course of the year. This is calculated using the AFINN lexicon which assigns words with a score that runs between -5 and 5, with negative scores indicating negative sentiment and positive scores indicating positive sentiment.
+From this, we’re able to see the sentiment of each author throughout the year. 
+This correlates with the words used most frequently by each author. From this, we can see that Blake, John and Michael tend to be more negative than the rest of the group.
+
+#_____________________________________ AFINN Analysis ________________________________________
+
+
+bullring_sentiment_afinn <- chat_clean %>%
+  inner_join(get_sentiments("afinn")) %>% 
+  group_by(author) %>% 
+  summarise(sentiment = sum(value)) %>% 
+  mutate(method = "Group Chat Sentiment")
+
+bullring_sentiment_afinn%>%
+  ggplot(aes(author, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~method, ncol = 3, scales = "free_y")
+
+#_____________________________________ AFINN Analysis ________________________________________
+
+bing_and_nrc <- bind_rows(chat_clean %>% 
+                            inner_join(get_sentiments("bing")) %>%
+                            mutate(method = "Bing et al."),
+                          chat_clean %>% 
+                            inner_join(get_sentiments("nrc") %>% 
+                                         filter(sentiment %in% c("positive", 
+                                                                 "negative"))) %>%
+                            mutate(method = "NRC")) %>%
+  count(method, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
